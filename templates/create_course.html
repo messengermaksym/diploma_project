@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/course_form.css' %}">
+
+<div class="container">
+    <h1>{% if course %}Редагувати курс{% else %}Створити курс{% endif %}</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">{% if course %}Зберегти{% else %}Створити{% endif %}</button>
+    </form>
+</div>
+{% endblock %}

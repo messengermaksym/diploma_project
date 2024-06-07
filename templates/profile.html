@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <h1>Профіль користувача</h1>
+    <div class="profile-container">
+        <img src="{% if user.profile_photo %}{{ user.profile_photo.url }}{% else %}{% static 'img/default_profile.png' %}{% endif %}" alt="Profile Photo" class="profile-photo">
+        <p><b>Ім'я:</b>  <span id="first_name">{{ user.first_name }}</span></p>
+        <p><b>Прізвище:</b> <span id="last_name">{{ user.last_name }}</span></p>
+        <p><b>Роль:</b> {{ user.role }}</p>
+        <p><b>Група:</b> {{ user.groups.all|join:", " }}</p>
+        <p><b>Ступінь:</b> {{ user.degree }}</p>
+        <p><b>Біографія:</b> <span id="bio">{{ user.bio }}</span></p>
+        <p><b>Email:</b> {{ user.email }}</p>
+        <p><b>Номер телефону:</b> <span id="phone_number">{{ user.phone_number }}</span></p>
+        <button id="edit_button" class="btn">Редагувати профіль</button>
+    </div>
+
+    <div id="edit_form_container" class="hidden">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Зберегти</button>
+            <button type="button" id="cancel_button" class="btn">Скасувати</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('edit_button').addEventListener('click', function() {
+            document.querySelector('.profile-container').classList.add('hidden');
+            document.getElementById('edit_form_container').classList.remove('hidden');
+        });
+
+        document.getElementById('cancel_button').addEventListener('click', function() {
+            document.querySelector('.profile-container').classList.remove('hidden');
+            document.getElementById('edit_form_container').classList.add('hidden');
+        });
+    </script>
+{% endblock %}

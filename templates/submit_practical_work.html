@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ course.title }}</h1>
+    <h2>Звіт: {{ practical_work.title }}</h2>
+
+    {% if not submission.grade %}
+        <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Надіслати</button>
+    </form>
+    {% endif %}
+    <h3>Статус роботи</h3>
+    <table class="table">
+        <tr>
+            <th>Статус роботи</th>
+            <td>
+                {% if submission and submission.file %}
+                    Здано
+                {% else %}
+                    Не здано
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>Статус оцінення</th>
+            <td>
+                {% if submission and submission.grade %}
+                    Оцінено
+                {% else %}
+                    Не оцінено
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>Дата дедлайну</th>
+            <td>{{ practical_work.deadline|date:"d M Y H:i" }}</td>
+        </tr>
+        <tr>
+            <th>Востаннє змінено</th>
+            <td>
+                {% if submission and submission.submitted_at %}
+                    {{ submission.submitted_at|date:"d M Y H:i" }}
+                {% else %}
+                    Немає
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>Завантаження файлу</th>
+            <td>
+                {% if submission and submission.file %}
+                    <a href="{{ submission.file.url }}">{{ submission.file.name }}</a>
+                {% else %}
+                    Файл не завантажено
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    {% if submission and submission.grade %}
+        <h3>Відгук</h3>
+        <table class="table">
+            <tr>
+                <th>Оцінка</th>
+                <td>{{ submission.grade }} / {{ practical_work.max_score }}</td>
+            </tr>
+            <tr>
+                <th>Оцінено на</th>
+                <td>{{ submission.grade_date|date:"d M Y H:i" }}</td>
+            </tr>
+            <tr>
+                <th>Оцінив</th>
+                <td>{{ submission.teacher.first_name }} {{ submission.teacher.last_name }}</td>
+            </tr>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}

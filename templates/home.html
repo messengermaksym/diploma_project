@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Наші курси{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">     
+<h1>Усі курси</h1>
+<div class="courses-container">
+    {% for course in courses %}
+    <div class="course-block">
+        <h2>{{ course.title }}</h2>
+        <p>{{ course.teacher.first_name }} {{ course.teacher.last_name }}</p>
+        <p>{{ course.description }}</p>
+        <a href="{% url 'course_detail' course.id %}" class="btn">Детальніше</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

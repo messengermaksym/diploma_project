@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/course_detail.css' %}">
+
+<div class="container">
+    <h1>{{ course.title }}</h1>
+    <h2>Анотація</h2>
+    <p class="course-desc">{{ course.description }}</p>
+
+    <div id="accessStatus" style="display: none;">
+        {{ user_has_access }}
+    </div>
+
+    <div class="accordion" id="accordionExample">
+        <h2>Програма курсу</h2>
+        {% for module in course.modules.all %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ forloop.counter }}">
+                    {{ module.title }}
+                </button>
+            </h2>
+            <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    {{ module.content }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="teachers-container">
+        <h2>Викладачі курсу</h2>
+        <div class="teacher-container">
+            {% for teacher in course.teachers.all %}
+            <div class="teacher-card">
+                <img src="{% if teacher.profile_photo %}{{ teacher.profile_photo.url }}{% else %}{% static 'img/default_profile.png' %}{% endif %}" alt="Profile Photo" class="teacher-photo">
+                <div class="teacher-info">
+                    <h3>{{ teacher.first_name }} {{ teacher.last_name }}</h3>
+                    <p class="teacher-degree">{{ teacher.degree }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% if request.user in course.teachers.all %}
+    <a href="{% url 'edit_course' course.id %}" class="btn btn-warning">Редагувати курс</a>
+    <a href="{% url 'check_practicals' course.id %}" class="btn btn-primary">Перевірити практичні роботи</a>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var accessStatus = document.getElementById('accessStatus').innerText.trim() === 'True';
+    if (accessStatus) {
+        document.querySelector('.accordion').style.display = 'none';
+        document.querySelector('.teachers-container').style.display = 'none';
+        document.querySelector('.container').insertAdjacentHTML('beforeend', `
+            <h2>Матеріали курсу</h2>
+            <div class="accordion" id="lectureMaterials">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Лекційні матеріали
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#lectureMaterials">
+                        <div class="accordion-body">
+                            {% for material in course.lecturematerial_set.all %}
+                            <a href="{{ material.file.url }}" target="_blank">{{ material.title }}</a><br>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Практичні завдання
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#lectureMaterials">
+                        <div class="accordion-body">
+                            {% for work in course.practicalwork_set.all %}
+                            <a href="{{ work.file.url }}" target="_blank">{{ work.title }}</a><br>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            Надіслати виконану практичну роботу
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#lectureMaterials">
+                        <div class="accordion-body">
+                            {% for work in course.practicalwork_set.all %}
+                            <div>
+                                <a href="{% url 'submit_practical_work' work.id %}">Звіт до {{ work.title }}</a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            Тести
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#lectureMaterials">
+                        <div class="accordion-body">
+                            {% for test in course.test_set.all %}
+                            <a href="{% url 'take_test' test.id %}">{{ test.title }}</a><br>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+    }
+});
+</script>
+
+{% endblock %}

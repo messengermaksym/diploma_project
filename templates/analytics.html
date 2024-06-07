@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1>Аналітика успішності студентів</h1>
+    {% for course_data in data %}
+        <h2>{{ course_data.course.title }}</h2>
+        <p>Середня оцінка по курсу: {{ course_data.avg_grade }}</p>
+        <p>Всього студентів: {{ course_data.total_students }}</p>
+        <p>Студенти, які здали всі роботи: {{ course_data.students_passed_all }}</p>
+        <h3>Практичні роботи</h3>
+        <ul>
+            {% for practical in course_data.practicals %}
+                <li>{{ practical.title }} - Середня оцінка: {{ practical.avg_grade }}, Здали: {{ practical.students_submitted }}</li>
+            {% endfor %}
+        </ul>
+        <h3>Успішність по групам</h3>
+        <ul>
+            {% for group in course_data.groups %}
+                <li>{{ group.name }} - Середня оцінка: {{ group.avg_grade }}</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+    <h3>Графіки</h3>
+    {% for plot in plots %}
+        {{ plot|safe }}
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/course_form.css' %}">
+
+<div class="container">
+    <h2>Редагувати курс</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ course_form.as_p }}
+        <h3>Модулі</h3>
+        {{ module_formset.management_form }}
+        {% for form in module_formset %}
+            {{ form.as_p }}
+        {% endfor %}
+        
+        <h3>Лекційні матеріали</h3>
+        {{ lecture_material_formset.management_form }}
+        {% for form in lecture_material_formset %}
+            {{ form.as_p }}
+        {% endfor %}
+        
+        <h3>Практичні роботи</h3>
+        {{ practical_work_formset.management_form }}
+        {% for form in practical_work_formset %}
+            {{ form.as_p }}
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary">Зберегти</button>
+        <a href="{% url 'course_detail' course.id %}" class="btn btn-secondary">Скасувати</a>
+        <button type="submit" class="btn btn-danger" name="delete">Видалити</button>
+    </form>
+</div>
+{% endblock %}

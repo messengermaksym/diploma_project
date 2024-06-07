@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1>Перевірка практичних робіт для {{ course.title }}</h1>
+        <div class="practicals-container">
+            {% for practical in practical_works %}
+                <div class="practical-block">
+                    <h3>{{ practical.title }}</h3>
+                    <a href="{% url 'check_practical_details' course.id practical.id %}" class="btn btn-primary">Перевірити</a>
+                </div>
+            {% endfor %}
+        </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1>Перевірка робіт для {{ practical_work.title }}</h1>
+    <h2>Курс: {{ course.title }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for group_name, submissions in submissions_by_group.items %}
+            <div class="group-block">
+                <h3>Група: {{ group_name }}</h3>
+                {% for submission in submissions %}
+                    {% if submission.file %}
+                        <div class="submission-block">
+                            <p><strong>Студент:</strong> {{ submission.student.first_name }} {{ submission.student.last_name }}</p>
+                            <a href="{{ submission.file.url }}" class="btn btn-primary">Переглянути роботу</a>
+                            <input type="number" name="grade_{{ submission.id }}" value="{{ submission.grade }}" placeholder="Оцінка" class="form-control"/>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-success">Зберегти оцінки</button>
+    </form>
+</div>
+{% endblock %}
